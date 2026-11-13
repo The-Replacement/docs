@@ -7,6 +7,19 @@ Defaults are tuned for the host as audited on 2026-11-13: i7-1165G7, 4C/8T,
 32 GiB RAM, 8 GiB disk swap, NVMe 914 GB (11 % used), idle package 42 °C, fans
 at 0 RPM when idle.
 
+### Measured thermal envelope (before choosing thresholds)
+
+| State | Package | Fan | Notes |
+|---|---|---|---|
+| Idle, stack streaming | 42–46 °C | 0 rpm → 1800 rpm | Fan spins up briefly and settles |
+| During the hourly TTS render | **72 °C** peak | 1800 rpm | ~1–2 min, one core saturated with the model load |
+| Kernel throttle events | none observed | — | No `cpu clock throttled` in either boot |
+
+This is why `TempWarm` is 70 °C **for 10 minutes** and not "70 °C": the station
+touches 72 °C every hour by design, and an alert that fires hourly is an alert
+that gets muted within a week. A rule with no duration would have been wrong on
+day one, and the measurement is what proves it.
+
 ## Thermal
 
 | Rule | Condition | For | Severity | Action |
