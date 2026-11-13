@@ -31,7 +31,8 @@ A station is self-sustaining when, with the operator away for two weeks:
 2. No resource grows without a bound (disk, inodes, journal, images, logs).
 3. Every failure either repaired itself or is visible in one place on return.
 4. Nothing required a decision that only a human could make.
-5. A fresh machine could be rebuilt from git + a backup, without archaeology.
+5. A fresh machine could be rebuilt from git — and the two files that are not
+   derivable (`state.json`, `.env`) are kilobytes, not a backup system.
 
 Those five are testable. "It feels automated" is not.
 
@@ -63,6 +64,7 @@ Full reasoning and the failure it prevents: [`02-design.md`](02-design.md).
 | [`01-what-exists.md`](01-what-exists.md) | Code-verified inventory of today's autonomous behaviour, and the gaps with the failure each one causes |
 | [`02-design.md`](02-design.md) | Target design: job model, resource gate, retention as code, self-heal ladder, status surface |
 | [`03-roadmap.md`](03-roadmap.md) | Ordered, issue-sized steps, each independently shippable |
+| [`04-disposability.md`](04-disposability.md) | Why there is no backup job, what is derivable, and the two files that are not |
 
 ## Non-goals
 
