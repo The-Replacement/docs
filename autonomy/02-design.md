@@ -13,7 +13,7 @@ about priorities, locks and resource conditions.
 ```
 radio-job render      # indiegen cycle (heavy: 1 core, ~7 min, 1.5 GB)
 radio-job tts         # mario bucket  (heavy: 1 core, minutes, 535 MB peak)
-radio-job rotate      # publish + liquidsoap restart (light, must not race)
+radio-job preflight   # the gate's verdict, alone, for debugging
 radio-job gc          # retention (light, I/O heavy)
 radio-job verify      # health probes, writes the status file
 ```

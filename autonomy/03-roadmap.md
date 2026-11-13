@@ -36,8 +36,19 @@ broken.
 
 ## Step 4 — The resource gate and one scheduler
 
-`radio-job` with `render|tts|rotate`, the shared heavy lock, `radio-batch.slice`,
-and deferral on thermal/PSI/stream-health. Replaces three cron entries.
+**Delivered behind a shadow flag on 2026-11-13.** `radio-job preflight|tts|render`
+reads the gate from `data/status.json` (refreshed if older than 10 minutes) and
+defers on: package temp ≥ 78 °C, PSI memory `some/avg60` > 10, disk below the
+floor, or a stream that is not flowing. A parse error closes the gate.
+
+One correction to the original design: there is no `rotate` job. Publishing is
+atomic *inside* the generator, and the host's per-minute watcher already owns the
+restart signal — a host-side rotate command would be a second writer racing the
+first.
+
+`RADIO_JOB_SHADOW=1` is installed hourly next to the existing `mario-refresh.sh`
+cron, so both paths run and the log records what the gate would have done. Cut
+over when the shadow log shows no deferrals that the real run needed.
 
 **Issue:** "Replace cron entries with radio-job and a resource gate".
 **Verify:** force a deferral (write a fake temperature or run a CPU burner) and
@@ -64,9 +75,15 @@ clear message.
 
 ## Step 7 — Bootstrap
 
-`infra/deploy/bootstrap.sh`: from a fresh Ubuntu install to a running station.
-This is what makes the appliance reproducible rather than a pet, and it is the
-only way to test that the previous six steps are complete.
+**Delivered on 2026-11-13, not yet executed end to end.** `infra/deploy/bootstrap.sh`
+goes from a fresh Ubuntu Server to a running station: packages, docker, zram,
+journald cap, ufw rules, both repos, `.env` at 0600 from a path you provide, the
+runtime directories with correct ownership, the cron entries, and `up -d` without
+`cam` (no device on a fresh box). Idempotent, `--dry-run` supported.
+
+Its honest status: syntax and shellcheck clean, dry-run verified against the
+live host. **It has never provisioned a virgin machine**, and until it does,
+"reproducible" is still a claim.
 
 **Issue:** "Add a bootstrap script for a radio appliance".
 **Verify:** rebuild a VM (or a spare machine) and get audio playing from it,
